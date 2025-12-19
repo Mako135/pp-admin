@@ -1,39 +1,42 @@
-import { useMutation } from "@tanstack/react-query";
+"use client";
+
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { apiRequest } from "@/api";
-import { handleApiError } from "@/api/error";
-import type { LoginData } from "./types";
+import { LoginSchema, type LoginData } from "./types";
 
 export const useLogin = () => {
-	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();
-
-	const { mutateAsync, isPending } = useMutation({
-		mutationKey: ["login"],
-		mutationFn: async (data: LoginData) => {
-			const newFormData = new FormData();
-			newFormData.append("username", data.username);
-			newFormData.append("password", data.password);
-			const response = await apiRequest<void>(
-				"post",
-				"/auth/admin/login",
-				newFormData,
-				"auth",
-			);
-
-			const errorResult = handleApiError(response);
-			if (errorResult) setError(errorResult.error);
-		},
-		onSuccess: () => {
-			router.push("/dashboard");
-			setError(null);
-		},
+	const methods = useForm<LoginData>({
+		resolver: zodResolver(LoginSchema),
+		mode: "onBlur",
 	});
 
+	const mutationFn = async (data: LoginData) => {
+		const newFormData = new FormData();
+		newFormData.append("username", data.username);
+		newFormData.append("password", data.password);
+
+		const response = await apiRequest<void>(
+			"post",
+			"/auth/admin/login",
+			newFormData,
+			"auth",
+		);
+
+		if (!response.ok) {
+			throw response;
+		}
+	};
+
+	const onSuccess = () => {
+		router.push("/dashboard");
+	};
+
 	return {
-		login: mutateAsync,
-		isPending,
-		error,
+		methods,
+		mutationFn,
+		onSuccess,
 	};
 };

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Базовые типы для JSON конфигурации формы
-export type FieldType = "text" | "email" | "password" | "tel" | "textarea";
+export type FieldType = "text" | "email" | "password" | "tel" | "textarea" | "number" | "date";
 
 export interface FormFieldConfig {
 	name: string;

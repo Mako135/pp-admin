@@ -59,7 +59,6 @@ export const apiRequest = async <T>(
 
 		return { ok: true, data: response };
 	} catch (error) {
-		console.log("API request error:", error);
 		if ("isFetchClientError" in (error as object)) {
 			const fetchError = error as {
 				response?: { status?: number; data?: unknown; headers?: Headers };
