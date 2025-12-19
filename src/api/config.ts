@@ -147,10 +147,6 @@ class FetchClient {
 		const url = `${this.baseURL}${endpoint}`;
 		const headers = new Headers(this.defaultHeaders);
 
-		console.log("Request URL:", url);
-		console.log("Request body:", options.body);
-		console.log("Request method:", options.method);
-
 		if (options.headers) {
 			const customHeaders = new Headers(options.headers);
 			customHeaders.forEach((value, key) => {
@@ -206,8 +202,6 @@ class FetchClient {
 			headers,
 		});
 
-		console.log("Request headers:", Object.fromEntries(headers.entries()));
-
 		if (!this.skipAuth && response.status === 401 && !options._retry) {
 			options._retry = true;
 
@@ -247,6 +241,14 @@ class FetchClient {
 				},
 				request: null,
 			};
+		}
+
+		// Для 204 No Content и других пустых ответов
+		if (
+			response.status === 204 ||
+			response.headers.get("content-length") === "0"
+		) {
+			return {} as T;
 		}
 
 		const contentType = response.headers.get("content-type");

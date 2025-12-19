@@ -39,8 +39,6 @@ export const apiRequest = async <T>(
 			method: method.toUpperCase(),
 		};
 
-		console.log(finalUrl, data);
-
 		if (data !== undefined && data !== null) {
 			if (
 				data instanceof FormData ||
@@ -56,6 +54,8 @@ export const apiRequest = async <T>(
 		}
 
 		const response = await client.request<T>(finalUrl, options);
+
+		console.log("API request successful:", { response });
 
 		return { ok: true, data: response };
 	} catch (error) {

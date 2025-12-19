@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { apiRequest } from "@/api";
 import { handleApiError } from "@/api/error";
 import { createZodSchemaFromConfig } from "@/shared/lib/form-schema";
@@ -38,6 +39,33 @@ export async function loginAction(prevState: unknown, formData: FormData) {
 		newFormData,
 		"auth",
 	);
+
+	//  if (res.ok && res.data) {
+	//     const cookieStore = await cookies();
+
+	//     const accessToken = res.data.access || res.data.access_token;
+	//     const refreshToken = res.data.refresh || res.data.refresh_token;
+
+	//     if (accessToken) {
+	//         cookieStore.set("access_token", accessToken, {
+	//             httpOnly: true,
+	//             secure: process.env.NODE_ENV === "production",
+	//             sameSite: "lax",
+	//             path: "/",
+	//             maxAge: 60 * 60 * 24, // 24 часа или ваше значение
+	//         });
+	//     }
+
+	//     if (refreshToken) {
+	//         cookieStore.set("refresh_token", refreshToken, {
+	//             httpOnly: true,
+	//             secure: process.env.NODE_ENV === "production",
+	//             sameSite: "lax",
+	//             path: "/",
+	//             maxAge: 60 * 60 * 24 * 7, // 7 дней или ваше значение
+	//         });
+	//     }
+	// }
 
 	const errorResult = handleApiError(res);
 	if (errorResult) return errorResult;
@@ -102,10 +130,15 @@ export async function forgotPasswordAction(
 		};
 	}
 
-	// Здесь логика отправки email с ссылкой для сброса пароля
-	await new Promise((resolve) => setTimeout(resolve, 1000));
+	const res = await apiRequest<void>(
+		"post",
+		"/auth/admin/reset-password",
+		result.data,
+		"auth",
+	);
 
-	console.log("Forgot password data:", result.data);
+	const errorResult = handleApiError(res);
+	if (errorResult) return errorResult;
 
 	return {
 		success: true,
@@ -120,11 +153,11 @@ export async function resetPasswordAction(
 ) {
 	const schema = createZodSchemaFromConfig(resetPasswordFormConfig);
 
-	const token = formData.get("token") as string;
-	const uuid = formData.get("uuid") as string;
+	const token = formData.get("token");
+	const uid = formData.get("uid");
 
 	// Validate token and uuid presence
-	if (!token || !uuid) {
+	if (!token || !uid) {
 		return {
 			success: false,
 			error: "Токен или UUID отсутствуют. Ссылка недействительна.",
@@ -132,8 +165,8 @@ export async function resetPasswordAction(
 	}
 
 	const data = {
-		password: formData.get("password"),
-		confirmPassword: formData.get("confirmPassword"),
+		new_password: formData.get("new_password"),
+		confirm_password: formData.get("confirm_password"),
 	};
 
 	const result = schema.safeParse(data);
@@ -146,18 +179,31 @@ export async function resetPasswordAction(
 	}
 
 	// Дополнительная проверка совпадения паролей
-	if (data.password !== data.confirmPassword) {
+	if (data.new_password !== data.confirm_password) {
 		return {
 			success: false,
 			errors: {
-				confirmPassword: ["Пароли не совпадают"],
+				confirm_password: ["Пароли не совпадают"],
 			},
 		};
 	}
 
-	await new Promise((resolve) => setTimeout(resolve, 1000));
+	const finalData = {
+		token,
+		uid,
+		new_password: result.data.new_password,
+		confirm_password: result.data.confirm_password,
+	};
 
-	console.log("Reset password data:", { ...result.data, token, uuid });
+	const res = await apiRequest<void>(
+		"post",
+		"/auth/admin/reset-password-confirm",
+		finalData,
+		"auth",
+	);
+
+	const errorResult = handleApiError(res);
+	if (errorResult) return errorResult;
 
 	return {
 		success: true,

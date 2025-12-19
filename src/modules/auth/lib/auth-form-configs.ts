@@ -29,6 +29,10 @@ export const loginFormConfig: FormConfig = {
 					message: "Пароль должен содержать минимум 6 символов",
 				},
 			},
+			link: {
+				href: "/auth/forgot-password",
+				label: "Забыли пароль?",
+			},
 		},
 	],
 };
@@ -102,7 +106,7 @@ export const resetPasswordFormConfig: FormConfig = {
 	successMessage: "Пароль успешно изменен",
 	fields: [
 		{
-			name: "password",
+			name: "new_password",
 			label: "Новый пароль",
 			type: "password",
 			placeholder: "••••••••",
@@ -119,7 +123,7 @@ export const resetPasswordFormConfig: FormConfig = {
 			},
 		},
 		{
-			name: "confirmPassword",
+			name: "confirm_password",
 			label: "Подтвердите пароль",
 			type: "password",
 			placeholder: "••••••••",

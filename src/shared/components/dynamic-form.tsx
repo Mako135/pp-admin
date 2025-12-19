@@ -1,6 +1,8 @@
 "use client";
 
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/shared/ui/alert";
@@ -26,6 +28,7 @@ interface DynamicFormProps {
 	onSuccess?: () => void;
 	footer?: React.ReactNode;
 	className?: string;
+	redirectUrl?: string;
 }
 
 export function DynamicForm({
@@ -36,14 +39,20 @@ export function DynamicForm({
 	onSuccess,
 	footer,
 	className,
+	redirectUrl,
 }: DynamicFormProps) {
 	const [state, formAction, pending] = useActionState(action, null);
+	const router = useRouter();
 
 	useEffect(() => {
-		if (state?.success && onSuccess) {
-			onSuccess();
+		if (state?.success) {
+			if (redirectUrl) {
+				router.push(redirectUrl);
+			} else if (onSuccess) {
+				onSuccess();
+			}
 		}
-	}, [state?.success, onSuccess]);
+	}, [state?.success, onSuccess, redirectUrl, router]);
 
 	return (
 		<Card className={cn("w-sm", className)}>
@@ -61,7 +70,12 @@ export function DynamicForm({
 						))}
 
 					{config.fields.map((field) => (
-						<Field key={field.name}>
+						<Field key={field.name} className="relative">
+							{field.link && (
+								<div className="absolute top-0 right-0 text-sm hover:underline">
+									<Link href={field.link.href}>{field.link.label}</Link>
+								</div>
+							)}
 							<FieldLabel>{field.label}</FieldLabel>
 							{field.type === "textarea" ? (
 								<Textarea

@@ -19,7 +19,7 @@ export const refreshToken = async (): Promise<RefreshTokenI> => {
 		}
 
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_API_URL}auth/jwt/refresh/`,
+			`${process.env.NEXT_PUBLIC_API_URL}auth/admin/refresh/`,
 			{
 				method: "POST",
 				credentials: "include",

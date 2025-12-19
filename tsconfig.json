@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "src/modules/dashboard/locations/index.tsx"  ],
   "exclude": ["node_modules"]
 }
