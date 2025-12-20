@@ -5,8 +5,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { apiRequest } from "@/api";
 import { LoginSchema, type LoginData } from "./types";
+import { authStore } from "@/shared/lib/auth-store";
 
 export const useLogin = () => {
+	const store = authStore();
 	const router = useRouter();
 	const methods = useForm<LoginData>({
 		resolver: zodResolver(LoginSchema),
@@ -27,6 +29,13 @@ export const useLogin = () => {
 
 		if (!response.ok) {
 			throw response;
+		}
+
+		const token = await fetch("/api/token/");
+		const tokenData = await token.json();
+
+		if (tokenData?.access_token) {
+			store.setToken(tokenData.access_token);
 		}
 	};
 

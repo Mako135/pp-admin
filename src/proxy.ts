@@ -7,23 +7,23 @@ const isSecurePath = (path: string) => {
 };
 
 export async function proxy(req: NextRequest) {
-	const { pathname } = req.nextUrl;
-	const refreshToken = req.cookies.get("refresh_token_cookie")?.value;
-	const hasAuth = !!refreshToken;
+	// const { pathname } = req.nextUrl;
+	// const refreshToken = req.cookies.get("refresh_token_cookie")?.value;
+	// const hasAuth = !!refreshToken;
 
-	console.log("Proxy middleware:", { pathname, hasAuth });
+	// console.log("Proxy middleware:", { pathname, hasAuth });
 
-	if (!isSecurePath(pathname) && !hasAuth) {
-		return NextResponse.next();
-	}
+	// if (!isSecurePath(pathname) && !hasAuth) {
+	// 	return NextResponse.next();
+	// }
 
-	if (!isSecurePath(pathname) && hasAuth) {
-		return NextResponse.redirect(new URL("/dashboard", req.url));
-	}
+	// if (!isSecurePath(pathname) && hasAuth) {
+	// 	return NextResponse.redirect(new URL("/dashboard", req.url));
+	// }
 
-	if (isSecurePath(pathname) && !hasAuth) {
-		return NextResponse.redirect(new URL("/auth/login", req.url));
-	}
+	// if (isSecurePath(pathname) && !hasAuth) {
+	// 	return NextResponse.redirect(new URL("/auth/login", req.url));
+	// }
 
 	return NextResponse.next();
 }

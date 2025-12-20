@@ -12,9 +12,9 @@ export const refreshToken = async (): Promise<RefreshTokenI> => {
 
 		if (typeof window === "undefined") {
 			const { cookies } = await import("next/headers");
-			const refreshCookie = (await cookies()).get("refresh_token")?.value;
+			const refreshCookie = (await cookies()).get("refresh_token_cookie")?.value;
 			if (refreshCookie) {
-				headers.Cookie = `refresh_token=${refreshCookie}`;
+				headers.Cookie = `refresh_token_cookie=${refreshCookie}`;
 			}
 		}
 

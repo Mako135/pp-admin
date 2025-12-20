@@ -38,7 +38,7 @@ async function _fetchToken(): Promise<string | null> {
 		if (typeof window === "undefined") {
 			// На сервере получаем токен из cookies
 			const { cookies } = await import("next/headers");
-			const token = (await cookies()).get("access_token")?.value || null;
+			const token = (await cookies()).get("access_token_cookie")?.value || null;
 			store.setToken(token);
 			return token;
 		}
@@ -179,7 +179,8 @@ class FetchClient {
 		if (!this.skipAuth && !headers.has("Authorization")) {
 			if (typeof window === "undefined") {
 				const { cookies } = await import("next/headers");
-				const token = (await cookies()).get("access_token")?.value || null;
+				const token =
+					(await cookies()).get("access_token_cookie")?.value || null;
 				if (token) {
 					headers.set("Authorization", `Bearer ${token}`);
 				}
@@ -267,7 +268,7 @@ class FetchClient {
 			return response.blob() as unknown as T;
 		}
 
-		return response as unknown as T;
+		return response as T;
 	}
 }
 

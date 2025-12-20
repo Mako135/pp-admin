@@ -42,17 +42,25 @@ const buttonVariants = cva(
           "border-secondary bg-secondary text-secondary-foreground hover:bg-secondary/90 data-pressed:bg-secondary/90",
       },
     },
-  },
+  }
 );
 
 interface ButtonProps extends useRender.ComponentProps<"button"> {
   variant?: VariantProps<typeof buttonVariants>["variant"];
   size?: VariantProps<typeof buttonVariants>["size"];
+  asChild?: boolean;
 }
 
-function Button({ className, variant, size, render, ...props }: ButtonProps) {
+function Button({
+  className,
+  variant,
+  size,
+  render,
+  asChild,
+  ...props
+}: ButtonProps) {
   const typeValue: React.ButtonHTMLAttributes<HTMLButtonElement>["type"] =
-    render ? undefined : "button";
+    render || asChild ? undefined : "button";
 
   const defaultProps = {
     className: cn(buttonVariants({ className, size, variant })),
@@ -61,9 +69,12 @@ function Button({ className, variant, size, render, ...props }: ButtonProps) {
   };
 
   return useRender({
-    defaultTagName: "button",
+    defaultTagName: asChild ? undefined : "button",
     props: mergeProps<"button">(defaultProps, props),
-    render,
+    //@ts-ignore
+
+    render:
+      render || (asChild ? (children: React.ReactNode) => children : undefined),
   });
 }
 
